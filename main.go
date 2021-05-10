@@ -10,11 +10,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	PLAY_NEXT = "audio_next"
-	PLAY_PREV = "audio_prev"
-)
-
 func init() {
 	log.SetFormatter(&log.TextFormatter{
 		FullTimestamp: true,
@@ -69,7 +64,13 @@ func logHandler(h http.Handler) http.Handler {
 
 func change(direction int, kb keybd_event.KeyBonding) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Info(fmt.Sprintf("Changing song : %d", direction))
+		var word string = "next"
+
+		if direction == keybd_event.VK_PREVIOUSSONG {
+			word = "previous"
+		}
+
+		log.Info(fmt.Sprintf("Playing %s song", word))
 		kb.SetKeys(direction)
 		kb.Press()
 		kb.Release()
