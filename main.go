@@ -44,6 +44,8 @@ func configurePaths() http.Handler {
 
 	paths.HandleFunc("/next", change(keybd_event.VK_NEXTSONG, kb))
 	paths.HandleFunc("/prev", change(keybd_event.VK_PREVIOUSSONG, kb))
+	paths.HandleFunc("/volume-up", change(keybd_event.VK_VOLUMEUP, kb))
+	paths.HandleFunc("/volume-down", change(keybd_event.VK_VOLUMEDOWN, kb))
 
 	// Configure the web server
 	var handler http.Handler = paths
@@ -62,16 +64,20 @@ func logHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-func change(direction int, kb keybd_event.KeyBonding) http.HandlerFunc {
+func change(key int, kb keybd_event.KeyBonding) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var word string = "next"
+		var message string = "Playing next song"
 
-		if direction == keybd_event.VK_PREVIOUSSONG {
-			word = "previous"
+		if key == keybd_event.VK_PREVIOUSSONG {
+			message = "Playing previous song"
+		} else if key == keybd_event.VK_VOLUMEUP {
+			message = "Increasing volume"
+		} else if key == keybd_event.VK_VOLUMEDOWN {
+			message = "Decreasing volume"
 		}
 
-		log.Info(fmt.Sprintf("Playing %s song", word))
-		kb.SetKeys(direction)
+		log.Info(message)
+		kb.SetKeys(key)
 		kb.Press()
 		kb.Release()
 		http.Redirect(w, r, "/", http.StatusSeeOther)
