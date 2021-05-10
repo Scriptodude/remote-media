@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-vgo/robotgo"
+	"github.com/micmonay/keybd_event"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -37,13 +37,18 @@ func main() {
 }
 
 func configurePaths() http.Handler {
+	kb, err := keybd_event.NewKeyBonding()
+	if err != nil {
+		panic(err)
+	}
+
 	paths := &http.ServeMux{}
 
 	static := http.FileServer(http.Dir("./static"))
 	paths.Handle("/", static)
 
-	paths.HandleFunc("/next", change(PLAY_NEXT))
-	paths.HandleFunc("/prev", change(PLAY_PREV))
+	paths.HandleFunc("/next", change(keybd_event.VK_NEXTSONG, kb))
+	paths.HandleFunc("/prev", change(keybd_event.VK_PREVIOUSSONG, kb))
 
 	// Configure the web server
 	var handler http.Handler = paths
@@ -62,10 +67,12 @@ func logHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-func change(direction string) http.HandlerFunc {
+func change(direction int, kb keybd_event.KeyBonding) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Info("Changing song : " + direction)
-		robotgo.KeyTap(direction)
+		log.Info(fmt.Sprintf("Changing song : %d", direction))
+		kb.SetKeys(direction)
+		kb.Press()
+		kb.Release()
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
