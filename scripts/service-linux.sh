@@ -3,28 +3,34 @@
 # chmod a+x ./service-linux.sh
 # sudo ./service-linux.sh $USER
 
-cd ..
-dest="$(pwd)/bin"
-mkdir -p "$dest"
-/usr/local/go/bin/go build -o "$dest/remote-media" .
-chmod +x "$dest/remote-media"
-chown $1:$1 "$dest/remote-media"
+systemctl disable "remote-media"
 
+echo "Cleaning up previous stuff"
+rm -f "/etc/systemd/system/remote-media.service"
+rm -f /usr/local/remote-media 
+
+echo "BUILDING"
+cd ..
+/usr/local/go/bin/go build -o /usr/local/remote-media .
+chmod 744 scripts/remote-media
+
+echo "Creating service"
 cat > "/etc/systemd/system/remote-media.service" << EOM
 [Unit]
 Description=Remote media handler
-After=network.target
 StartLimitIntervalSec=0
 [Service]
-Type=simple
+Type=idle
 Restart=always
-RestartSec=1
+RestartSec=15
 User=$1
-ExecStart="$dest/remote-media" -port=1337
+ExecStart="/usr/local/remote-media" -port=1337
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 EOM
 
+echo "Enabled / starting service"
 systemctl enable "remote-media"
 systemctl start "remote-media"
+systemctl daemon-reload
