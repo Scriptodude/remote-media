@@ -38,6 +38,7 @@ func StartServer() {
 
 func configurePaths() http.Handler {
 	kb := mediahandler.NewKeyboardMediaHandler()
+	// kb := mediahandler.NewDbusMediaHandler()
 
 	paths := &http.ServeMux{}
 

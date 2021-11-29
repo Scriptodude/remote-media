@@ -1,6 +1,8 @@
 package mediahandler
 
 import (
+	"github.com/godbus/dbus/v5"
+	"github.com/godbus/dbus/v5/prop"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/micmonay/keybd_event"
@@ -25,4 +27,10 @@ type MediaHandler interface {
 type KeyboardMediaHandler struct {
 	kb  keybd_event.KeyBonding
 	log *log.Entry
+}
+
+type DbusMediaHandler struct {
+	media      *dbus.Conn
+	properties *prop.Properties
+	log        *log.Entry
 }
