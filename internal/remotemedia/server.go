@@ -1,22 +1,27 @@
-package main
+package remotemedia
 
 import (
 	"flag"
 	"fmt"
 	"net/http"
+	"path"
 	"time"
 
-	"github.com/micmonay/keybd_event"
+	"path/filepath"
+	"runtime"
+
+	"github.com/scriptodude/remote-media/pkg/mediahandler"
 	log "github.com/sirupsen/logrus"
 )
 
-func init() {
-	log.SetFormatter(&log.TextFormatter{
-		FullTimestamp: true,
-	})
-}
+var (
+	_, b, _, _ = runtime.Caller(0)
 
-func main() {
+	// Root folder of this project
+	root = filepath.Join(filepath.Dir(b), "../..")
+)
+
+func StartServer() {
 	port := flag.String("port", "8080", "The port to run the webservlet on, defaults to 8080")
 	flag.Parse()
 
@@ -32,20 +37,17 @@ func main() {
 }
 
 func configurePaths() http.Handler {
-	kb, err := keybd_event.NewKeyBonding()
-	if err != nil {
-		panic(err)
-	}
+	kb := mediahandler.NewKeyboardMediaHandler()
 
 	paths := &http.ServeMux{}
 
-	static := http.FileServer(http.Dir("./static"))
+	static := http.FileServer(http.Dir(path.Join(root, "web/static")))
 	paths.Handle("/", static)
 
-	paths.HandleFunc("/next", change(keybd_event.VK_NEXTSONG, kb))
-	paths.HandleFunc("/prev", change(keybd_event.VK_PREVIOUSSONG, kb))
-	paths.HandleFunc("/volume-up", change(keybd_event.VK_VOLUMEUP, kb))
-	paths.HandleFunc("/volume-down", change(keybd_event.VK_VOLUMEDOWN, kb))
+	paths.HandleFunc("/next", wrap(kb.PlayNext))
+	paths.HandleFunc("/prev", wrap(kb.PlayPrevious))
+	paths.HandleFunc("/volume-up", wrap(kb.VolumeUp))
+	paths.HandleFunc("/volume-down", wrap(kb.VolumeDown))
 
 	// Configure the web server
 	var handler http.Handler = paths
@@ -64,22 +66,9 @@ func logHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-func change(key int, kb keybd_event.KeyBonding) http.HandlerFunc {
+func wrap(fn func()) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var message string = "Playing next song"
-
-		if key == keybd_event.VK_PREVIOUSSONG {
-			message = "Playing previous song"
-		} else if key == keybd_event.VK_VOLUMEUP {
-			message = "Increasing volume"
-		} else if key == keybd_event.VK_VOLUMEDOWN {
-			message = "Decreasing volume"
-		}
-
-		log.Info(message)
-		kb.SetKeys(key)
-		kb.Press()
-		kb.Release()
+		fn()
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
