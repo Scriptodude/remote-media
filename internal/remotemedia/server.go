@@ -5,13 +5,17 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"strconv"
+	"strings"
 	"time"
 
 	"path/filepath"
 	"runtime"
 
-	"github.com/scriptodude/remote-media/pkg/mediahandler"
+	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/scriptodude/remote-media/internal/mediahandler"
 )
 
 var (
@@ -19,6 +23,8 @@ var (
 
 	// Root folder of this project
 	root = filepath.Join(filepath.Dir(b), "../..")
+
+	upgrader = websocket.Upgrader{}
 )
 
 func StartServer() {
@@ -37,7 +43,7 @@ func StartServer() {
 }
 
 func configurePaths() http.Handler {
-	kb := mediahandler.NewKeyboardMediaHandler()
+	// kb := mediahandler.NewKeyboardMediaHandler()
 	// kb := mediahandler.NewDbusMediaHandler()
 
 	paths := &http.ServeMux{}
@@ -45,14 +51,53 @@ func configurePaths() http.Handler {
 	static := http.FileServer(http.Dir(path.Join(root, "web/static")))
 	paths.Handle("/", static)
 
-	paths.HandleFunc("/next", wrap(kb.PlayNext))
-	paths.HandleFunc("/prev", wrap(kb.PlayPrevious))
-	paths.HandleFunc("/volume-up", wrap(kb.VolumeUp))
-	paths.HandleFunc("/volume-down", wrap(kb.VolumeDown))
+	paths.HandleFunc("/ws", handleWebSocket)
 
 	// Configure the web server
 	var handler http.Handler = paths
 	return logHandler(handler)
+}
+
+func handleWebSocket(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Print("upgrade:", err)
+		return
+	}
+	defer c.Close()
+
+	mediaHandler := mediahandler.NewKeyboardMediaHandler()
+	for {
+		opcode, message, err := c.ReadMessage()
+		if err != nil {
+			log.Println("read:", err)
+			break
+		}
+		log.Printf("recv: %d, %s", opcode, message)
+
+		// Opcode for text
+		if opcode != 0x1 {
+			log.Println("Not supporting message type, continuing")
+			continue
+		}
+
+		switch strings.TrimSpace(string(message)) {
+		case "volume_up":
+			c.WriteMessage(1, []byte(strconv.Itoa(mediaHandler.VolumeUp())))
+
+		case "volume_down":
+			c.WriteMessage(1, []byte(strconv.Itoa(mediaHandler.VolumeDown())))
+
+		case "play_next":
+			mediaHandler.PlayNext()
+
+		case "play_previous":
+			mediaHandler.PlayPrevious()
+
+		default:
+			log.Printf("Unkown command: %s", message)
+		}
+	}
 }
 
 func logHandler(h http.Handler) http.Handler {
@@ -65,11 +110,4 @@ func logHandler(h http.Handler) http.Handler {
 	}
 
 	return http.HandlerFunc(fn)
-}
-
-func wrap(fn func()) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		fn()
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	}
 }

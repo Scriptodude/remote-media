@@ -1,83 +1,128 @@
 <html>
-
-<head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
+    />
     <style>
-        button {
-            font-size: 70px !important;
-        }
+      button {
+        font-size: 70px !important;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="row h-25 w-100">
-        <div class="col h-100 w-100">
-            <form action="/volume-down" method="post">
-                <button type="submit" class="btn btn-light h-100 w-100 d-inline-block p-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="currentColor"
-                        class="bi bi-volume-down" viewBox="0 0 16 16">
-                        <path
-                            d="M9 4a.5.5 0 0 0-.812-.39L5.825 5.5H3.5A.5.5 0 0 0 3 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 9 12V4zM6.312 6.39 8 5.04v5.92L6.312 9.61A.5.5 0 0 0 6 9.5H4v-3h2a.5.5 0 0 0 .312-.11zM12.025 8a4.486 4.486 0 0 1-1.318 3.182L10 10.475A3.489 3.489 0 0 0 11.025 8 3.49 3.49 0 0 0 10 5.525l.707-.707A4.486 4.486 0 0 1 12.025 8z">
-                        </path>
-                    </svg>
-                </button>
-            </form>
-        </div>
-        <div class="col h-100 w-100">
-            <form action="/volume-up" method="post">
-                <button type="submit" class="btn btn-light h-100 w-100 d-inline-block p-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="currentColor"
-                        class="bi bi-volume-up" viewBox="0 0 16 16">
-                        <path
-                            d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z">
-                        </path>
-                        <path
-                            d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z">
-                        </path>
-                        <path
-                            d="M10.025 8a4.486 4.486 0 0 1-1.318 3.182L8 10.475A3.489 3.489 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.486 4.486 0 0 1 10.025 8zM7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12V4zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11z">
-                        </path>
-                    </svg>
-                </button>
-            </form>
-        </div>
+      <div class="col h-100 w-100">
+        <form action="/volume-down" method="post">
+          <button
+            type="submit"
+            class="btn btn-light h-100 w-100 d-inline-block p-3"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="70"
+              height="70"
+              fill="currentColor"
+              class="bi bi-volume-down"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M9 4a.5.5 0 0 0-.812-.39L5.825 5.5H3.5A.5.5 0 0 0 3 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 9 12V4zM6.312 6.39 8 5.04v5.92L6.312 9.61A.5.5 0 0 0 6 9.5H4v-3h2a.5.5 0 0 0 .312-.11zM12.025 8a4.486 4.486 0 0 1-1.318 3.182L10 10.475A3.489 3.489 0 0 0 11.025 8 3.49 3.49 0 0 0 10 5.525l.707-.707A4.486 4.486 0 0 1 12.025 8z"
+              ></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+      <div class="col h-100 w-100">
+        <form action="/volume-up" method="post">
+          <button
+            type="submit"
+            class="btn btn-light h-100 w-100 d-inline-block p-3"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="70"
+              height="70"
+              fill="currentColor"
+              class="bi bi-volume-up"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"
+              ></path>
+              <path
+                d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"
+              ></path>
+              <path
+                d="M10.025 8a4.486 4.486 0 0 1-1.318 3.182L8 10.475A3.489 3.489 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.486 4.486 0 0 1 10.025 8zM7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12V4zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11z"
+              ></path>
+            </svg>
+          </button>
+        </form>
+      </div>
     </div>
     <div class="row h-75 w-100">
-        <div class="col h-100 w-100">
-            <form action="/prev" method="post">
-                <button type="submit" class="btn btn-dark h-100 w-100 d-inline-block p-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="currentColor"
-                        class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd"
-                            d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z">
-                        </path>
-                        <path fill-rule="evenodd"
-                            d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z">
-                        </path>
-                    </svg>
-                    Prev
-                </button>
-            </form>
-        </div>
-        <div class="col h-100 w-100">
-            <form action="/next" method="post">
-                <button type="submit" class="btn btn-dark h-100 w-100 d-inline-block p-3">
-                    Next
-                    <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="currentColor"
-                        class="bi bi-chevron-double-right" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd"
-                            d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z">
-                        </path>
-                        <path fill-rule="evenodd"
-                            d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z">
-                        </path>
-                    </svg>
-                </button>
-            </form>
-        </div>
+      <div class="col h-100 w-100">
+        <form action="/prev" method="post">
+          <button
+            type="submit"
+            class="btn btn-dark h-100 w-100 d-inline-block p-3"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="70"
+              height="70"
+              fill="currentColor"
+              class="bi bi-chevron-double-left"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+              ></path>
+              <path
+                fill-rule="evenodd"
+                d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+              ></path>
+            </svg>
+            Prev
+          </button>
+        </form>
+      </div>
+      <div class="col h-100 w-100">
+        <form action="/next" method="post">
+          <button
+            type="submit"
+            class="btn btn-dark h-100 w-100 d-inline-block p-3"
+          >
+            Next
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="70"
+              height="70"
+              fill="currentColor"
+              class="bi bi-chevron-double-right"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"
+              ></path>
+              <path
+                fill-rule="evenodd"
+                d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"
+              ></path>
+            </svg>
+          </button>
+        </form>
+      </div>
     </div>
-</body>
-
+  </body>
 </html>
