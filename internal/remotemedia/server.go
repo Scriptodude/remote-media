@@ -43,17 +43,15 @@ func StartServer() {
 }
 
 func configurePaths() http.Handler {
-	// kb := mediahandler.NewKeyboardMediaHandler()
-	// kb := mediahandler.NewDbusMediaHandler()
-
 	paths := &http.ServeMux{}
 
+	// TODO: This should eventually be removed in favor for a flutter app
+	// TODO: The frontend currently does not work with the new backend
 	static := http.FileServer(http.Dir(path.Join(root, "web/static")))
 	paths.Handle("/", static)
 
 	paths.HandleFunc("/ws", handleWebSocket)
 
-	// Configure the web server
 	var handler http.Handler = paths
 	return logHandler(handler)
 }
@@ -81,6 +79,8 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		// TODO: Let the mediaHandler handle the message ?
+		// TODO: Maybe use a message broker middleware to call the proper methods and bridge between impl
 		switch strings.TrimSpace(string(message)) {
 		case "volume_up":
 			c.WriteMessage(1, []byte(strconv.Itoa(mediaHandler.VolumeUp())))

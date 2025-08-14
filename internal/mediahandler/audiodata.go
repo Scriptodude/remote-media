@@ -11,10 +11,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// getAudioLevel Returns the current audio level 0-100% of the first active audio sink
+// using the pactl unix command
 func getAudioLevel(log *logrus.Entry) int {
 	defaultLevel := log.Logger.Level
 	log.Logger.Level = logrus.DebugLevel
 	defer func() { log.Logger.Level = defaultLevel }()
+
 	cmd := exec.Command("pactl", "list", "sinks")
 	if errors.Is(cmd.Err, exec.ErrDot) {
 		cmd.Err = nil
@@ -37,10 +40,11 @@ func getAudioLevel(log *logrus.Entry) int {
 		return -1
 	}
 
+	// TODO: Extract this part in a function called "findFirstRunningSink"
 	for _, d := range data {
 		log.Debugf("sink %+v", d)
-		if d.state == "RUNNING" {
-			extractRegex, err := regexp.Compile("[0-9]{1,3}%")
+		if d.state == "RUNNING" { //< TODO: Use a strong type instead of string comparison ?
+			extractRegex, err := regexp.Compile("[0-9]{1,3}%") //< TODO: Extract the regex in a const
 
 			if err != nil {
 				log.Printf("unable to get volume, ignoring. %e", err)
@@ -69,6 +73,7 @@ type sinkData struct {
 	volume   string
 }
 
+// parseData parses the response coming from pactl into a sinkData struct
 func parseData(log *logrus.Entry, reader io.Reader) ([]sinkData, error) {
 	data, err := io.ReadAll(reader)
 
@@ -77,39 +82,43 @@ func parseData(log *logrus.Entry, reader io.Reader) ([]sinkData, error) {
 	}
 
 	stringData := string(data)
-	numberOfSink := strings.Count(stringData, "Sink #")
-	if numberOfSink == 0 {
-		return nil, errors.New("No sink found")
-	}
+	lines := strings.Split(stringData, "\n")
 
-	sinks := make([]sinkData, numberOfSink)
-	currentIdx := 0
-	for i := 0; i < numberOfSink; i++ {
-		currentIdx = strings.Index(stringData, "Sink #")
-		newLine := strings.Index(stringData[currentIdx:], "\n")
-		name := stringData[currentIdx : currentIdx+newLine]
+	sinks := make([]sinkData, 0)
 
-		currentIdx += newLine
-		stateLocation := strings.Index(stringData[currentIdx:], "State:")
-		newLine = strings.Index(stringData[currentIdx+stateLocation:], "\n")
-		state := stringData[currentIdx+stateLocation : currentIdx+stateLocation+newLine]
+	for lineNo := 0; lineNo < len(lines); lineNo++ {
 
-		currentIdx += newLine
-		volumeLocation := strings.Index(stringData[currentIdx:], "Volume:")
-		newLine = strings.Index(stringData[currentIdx+volumeLocation:], "\n")
-		log.Debugf("%d %d", volumeLocation, newLine)
-		volume := stringData[currentIdx+volumeLocation : currentIdx+volumeLocation+newLine]
+		// Closure that takes a line relative to lineNo (lineNo+i),
+		// removes the prop name and returns whatever data it contained, trimed of extra spaces
+		cleanData := func(i int, propName string) string {
+			if !strings.Contains(lines[lineNo+i], propName) {
+				log.Warnf("Wrong line number for %s (%d+%d) - %s", propName, lineNo, i, lines[lineNo+i])
+				return ""
+			}
 
-		sinks[i] = sinkData{
-			sinkName: strings.TrimSpace(name),
-			state:    strings.TrimSpace(strings.TrimLeft(state, "State:")),
-			volume:   strings.TrimSpace(strings.TrimLeft(volume, "Volume:")),
+			dataNoName := strings.TrimLeft(strings.TrimSpace(lines[lineNo+i]), propName)
+			return strings.TrimSpace(dataNoName)
 		}
 
-		log.Debugf("new sink %+v", sinks[i])
+		// We start a new sink
+		if strings.Contains(lines[lineNo], "Sink #") {
+			state := cleanData(1, "State:")
+			name := cleanData(2, "Name:")
+			volume := cleanData(9, "Volume:")
+			sink := sinkData{
+				sinkName: name,
+				state:    state,
+				volume:   volume,
+			}
+			sinks = append(sinks, sink)
+			log.Debugf("new sink %+v", sink)
 
-		currentIdx = newLine
-		stringData = stringData[newLine:]
+			lineNo += 9
+		}
+	}
+
+	if len(sinks) == 0 {
+		return nil, errors.New("No sink found")
 	}
 
 	return sinks, nil
