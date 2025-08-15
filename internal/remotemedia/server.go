@@ -20,7 +20,9 @@ var (
 	// Root folder of this project
 	root = filepath.Join(filepath.Dir(b), "../..")
 
-	upgrader = websocket.Upgrader{}
+	upgrader = websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool { return true },
+	}
 )
 
 func StartServer() {
@@ -53,13 +55,20 @@ func configurePaths() http.Handler {
 }
 
 func handleWebSocket(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
+	header := http.Header{}
+	header.Add("Access-Control-Allow-Origin", "*")
+	log.Info("Attempting to upgrade user")
+
+	c, err := upgrader.Upgrade(w, r, header)
 	if err != nil {
 		log.Print("upgrade:", err)
 		return
 	}
 	defer c.Close()
 
+	c.WriteControl(websocket.PingMessage, nil, time.Now().Add(1*time.Second))
+
+	log.Info("Upgrade successful")
 	messageBroker := NewMessageBroker()
 	for {
 		opcode, message, err := c.ReadMessage()
