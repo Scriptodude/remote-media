@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"path"
-	"strconv"
-	"strings"
 	"time"
 
 	"path/filepath"
@@ -14,8 +12,6 @@ import (
 
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/scriptodude/remote-media/internal/mediahandler"
 )
 
 var (
@@ -64,38 +60,17 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 
-	mediaHandler := mediahandler.NewKeyboardMediaHandler()
+	messageBroker := NewMessageBroker()
 	for {
 		opcode, message, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
 			break
 		}
-		log.Printf("recv: %d, %s", opcode, message)
 
-		// Opcode for text
-		if opcode != 0x1 {
-			log.Println("Not supporting message type, continuing")
-			continue
-		}
-
-		// TODO: Let the mediaHandler handle the message ?
-		// TODO: Maybe use a message broker middleware to call the proper methods and bridge between impl
-		switch strings.TrimSpace(string(message)) {
-		case "volume_up":
-			c.WriteMessage(1, []byte(strconv.Itoa(mediaHandler.VolumeUp())))
-
-		case "volume_down":
-			c.WriteMessage(1, []byte(strconv.Itoa(mediaHandler.VolumeDown())))
-
-		case "play_next":
-			mediaHandler.PlayNext()
-
-		case "play_previous":
-			mediaHandler.PlayPrevious()
-
-		default:
-			log.Printf("Unkown command: %s", message)
+		response := messageBroker.HandleMessage(opcode, message)
+		if response != nil {
+			c.WriteMessage(0x1, response)
 		}
 	}
 }
