@@ -39,7 +39,7 @@ func (mb *messageBrokerImpl) HandleMessage(opcode int, message []byte) []byte {
 
 	switch strings.TrimSpace(string(message)) {
 	case "volume_up":
-		return []byte(strconv.Itoa(mb.mediahandler.VolumeDown()))
+		return []byte(strconv.Itoa(mb.mediahandler.VolumeUp()))
 
 	case "volume_down":
 		return []byte(strconv.Itoa(mb.mediahandler.VolumeDown()))
