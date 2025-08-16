@@ -5,11 +5,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	// Matches volume in percent such as 100%, 49% or 0%
-	extractVolumeRegex = "[0-9]{1,3}%"
-)
-
 type audioLevel struct {
 	log        *logrus.Entry
 	pulseAudio pactl.PulseAudioController
