@@ -11,6 +11,7 @@ import (
 	"runtime"
 
 	"github.com/gorilla/websocket"
+	"github.com/scriptodude/remote-media/internal/mediahandler"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -65,7 +66,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	defer c.Close()
 
 	log.Info("Upgrade successful")
-	messageBroker := NewMessageBroker()
+	messageBroker := NewMessageBroker(mediahandler.NewKeyboardMediaHandler())
 
 	c.WriteMessage(0x1, messageBroker.GetCurrentState())
 

@@ -19,12 +19,10 @@ type messageBrokerImpl struct {
 	mediahandler mediahandler.MediaHandler
 }
 
-func NewMessageBroker() MessageBroker {
-
-	// TODO: Allow the caller to chose the mediahandler impl ?
+func NewMessageBroker(handler mediahandler.MediaHandler) MessageBroker {
 	return &messageBrokerImpl{
 		log:          log.GetLoggerForHandler("MessageBroker"),
-		mediahandler: mediahandler.NewKeyboardMediaHandler(),
+		mediahandler: handler,
 	}
 }
 
