@@ -43,9 +43,7 @@ func StartServer() {
 func configurePaths() http.Handler {
 	paths := &http.ServeMux{}
 
-	// TODO: This should eventually be removed in favor for a flutter app
-	// TODO: The frontend currently does not work with the new backend
-	static := http.FileServer(http.Dir(path.Join(root, "web/static")))
+	static := http.FileServer(http.Dir(path.Join(root, "web/release")))
 	paths.Handle("/", static)
 
 	paths.HandleFunc("/ws", handleWebSocket)
@@ -66,10 +64,11 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 
-	c.WriteControl(websocket.PingMessage, nil, time.Now().Add(1*time.Second))
-
 	log.Info("Upgrade successful")
 	messageBroker := NewMessageBroker()
+
+	c.WriteMessage(0x1, messageBroker.GetCurrentState())
+
 	for {
 		opcode, message, err := c.ReadMessage()
 		if err != nil {

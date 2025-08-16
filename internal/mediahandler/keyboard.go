@@ -12,6 +12,7 @@ import (
 type keyboardMediaHandler struct {
 	kb  keybd_event.KeyBonding
 	log *logrus.Entry
+	al  audioLevel
 }
 
 func NewKeyboardMediaHandler() MediaHandler {
@@ -20,9 +21,11 @@ func NewKeyboardMediaHandler() MediaHandler {
 		panic(err)
 	}
 
+	log := log.GetLoggerForHandler("Keyboard")
 	return &keyboardMediaHandler{
 		kb:  kb,
-		log: log.GetLoggerForHandler("Keyboard"),
+		log: log,
+		al:  audioLevel{log: log},
 	}
 }
 
@@ -35,21 +38,21 @@ func (k *keyboardMediaHandler) PlayNext() {
 // PlayPrevious implements the MediaHandler interface and plays the previous song
 func (k *keyboardMediaHandler) PlayPrevious() {
 	k.log.Info("Playing previous song")
-	tapKey(keybd_event.VK_NEXTSONG, k.kb)
+	tapKey(keybd_event.VK_PREVIOUSSONG, k.kb)
 }
 
 // VolumeUp implements the MediaHandler interface and increases the volume
 func (k *keyboardMediaHandler) VolumeUp() int {
 	k.log.Info("Increasing Volume")
 	tapKey(keybd_event.VK_VOLUMEUP, k.kb)
-	return getAudioLevel(k.log)
+	return k.al.getAudioLevel()
 }
 
 // VolumeUp implements the MediaHandler interface and increases the volume
 func (k *keyboardMediaHandler) VolumeDown() int {
 	k.log.Info("Decreasing volume")
 	tapKey(keybd_event.VK_VOLUMEDOWN, k.kb)
-	return getAudioLevel(k.log)
+	return k.al.getAudioLevel()
 }
 
 // tapKey taps a key on the keyboard
@@ -57,4 +60,15 @@ func tapKey(key int, kb keybd_event.KeyBonding) {
 	kb.SetKeys(key)
 	kb.Press()
 	kb.Release()
+}
+
+// GetVolume implements MediaHandler.
+func (k *keyboardMediaHandler) GetVolume() int {
+	return k.al.getAudioLevel()
+}
+
+// SetVolume implements MediaHandler.
+func (k *keyboardMediaHandler) SetVolume(level int) int {
+	k.al.setVolumeLevel(level)
+	return k.al.getAudioLevel()
 }

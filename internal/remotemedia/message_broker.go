@@ -11,6 +11,7 @@ import (
 
 type MessageBroker interface {
 	HandleMessage(opcode int, message []byte) []byte
+	GetCurrentState() []byte
 }
 
 type messageBrokerImpl struct {
@@ -27,6 +28,10 @@ func NewMessageBroker() MessageBroker {
 	}
 }
 
+func (mb *messageBrokerImpl) GetCurrentState() []byte {
+	return []byte(strconv.Itoa(mb.mediahandler.GetVolume()))
+}
+
 // HandleMessage implements the MessageBroker interface
 func (mb *messageBrokerImpl) HandleMessage(opcode int, message []byte) []byte {
 	mb.log.Infof("Received message %d, %s", opcode, message)
@@ -37,7 +42,26 @@ func (mb *messageBrokerImpl) HandleMessage(opcode int, message []byte) []byte {
 		return nil
 	}
 
-	switch strings.TrimSpace(string(message)) {
+	trimmed := strings.TrimSpace(string(message))
+
+	if strings.Contains(trimmed, "set_volume") {
+		split := strings.Split(trimmed, "=")
+
+		if len(split) != 2 {
+			mb.log.Errorf("Invalid format for set_volume %s", message)
+			return nil
+		}
+
+		volumeLevel, err := strconv.Atoi(split[1])
+		if err != nil {
+			mb.log.Errorf("Invalid format for set_volume %s", message)
+			return nil
+		}
+
+		return []byte(strconv.Itoa(mb.mediahandler.SetVolume(volumeLevel)))
+	}
+
+	switch trimmed {
 	case "volume_up":
 		return []byte(strconv.Itoa(mb.mediahandler.VolumeUp()))
 

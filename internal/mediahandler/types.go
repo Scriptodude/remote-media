@@ -12,4 +12,10 @@ type MediaHandler interface {
 
 	// VolumeDown decreases the volume of the media by a reasonable amount and returns the current volume level (0-100)
 	VolumeDown() int
+
+	// SetVolume sets the volume to the given percentage
+	SetVolume(int) int
+
+	// GetVolume gets the current volume percentage
+	GetVolume() int
 }
